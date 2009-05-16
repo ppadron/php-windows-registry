@@ -14,10 +14,15 @@ class System_Windows_Registry
         self::REG_SZ, self::REG_BINARY, self::REG_DWORD, self::REG_EXPAND_SZ
     );
 
-    private static function getShell()
+    public static function setShell($shell)
+    {
+        self::$_shell = $shell;
+    }
+
+    private static function _getShell()
     {
         if (!isset(self::$_shell)) {
-            self::$_shell = new COM('WScript.Shell');
+            self::setShell(new COM('WScript.Shell'));
         }
 
         return self::$_shell;
@@ -25,7 +30,7 @@ class System_Windows_Registry
 
     public static function read($path)
     {
-        $shell = self::getShell();
+        $shell = self::_getShell();
 
         try {
             $value = $shell->RegRead($path);
@@ -41,7 +46,7 @@ class System_Windows_Registry
 
     public static function delete($path)
     {
-        $shell = self::getShell();
+        $shell = self::_getShell();
 
         try {
             $shell->RegDelete($path);
@@ -57,7 +62,7 @@ class System_Windows_Registry
 
     public static function write($path, $value, $dataType = 'REG_SZ')
     {
-        $shell = self::getShell();
+        $shell = self::_getShell();
 
         if (!in_array($dataType, self::$_dataTypes)) {
             throw new InvalidArgumentException(
